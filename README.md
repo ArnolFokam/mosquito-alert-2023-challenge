@@ -45,7 +45,7 @@ class MosquitoAlert(BaseDataset):
     
 ```
 
-Here is the specifications for each required datasets method. See [BaseDataset](/mosquito/datasets/base.py).
+Here is the specifications for each required datasets method. See [BaseDataset](/mosquito/datasets/base.py#L6).
 
 - `__init__`: Loads the data using the configurations in `cfg`.
 - `__getitem__`: Returns a single data sample for model training.
