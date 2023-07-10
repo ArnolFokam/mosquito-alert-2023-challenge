@@ -343,3 +343,4 @@ tags
 data/
 outputs/
 *_private/
+.vscode/
