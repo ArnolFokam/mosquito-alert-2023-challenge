@@ -55,13 +55,11 @@ Here is the specifications for each required datasets method.
     ```python
     @staticmethod
     def get_train_and_val_dataset(cfg):
-        train_dataset = # dataset creation logic
+        train_dataset = # dataset object creation logic
         return train dataset, None
     ```
 
-Note: 
-- You can add additional methods to your class if you wish. Just make sure the required methods are also implemented.
-- 
+Note:  You are free to add additional methods to your classes.
 
 
 ## TIPS
