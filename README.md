@@ -42,7 +42,7 @@ class MosquitoAlert:
         raise NotImplementedError
     
     @staticmethod
-    def get_train_and_test_dataset(cfg):
+    def get_train_and_val_dataset(cfg):
         raise NotImplementedError
 ```
 
