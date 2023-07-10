@@ -6,6 +6,9 @@ from functools import lru_cache
 from typing import Any, Optional
 from mosquito.datasets.base import BaseDataset
 
+# because some images are too large
+PIL.Image.MAX_IMAGE_PIXELS = 933120000
+
 
 class MosquitoAlertDatasetv0(BaseDataset):
     images_folder: str = "train_images/"
@@ -27,14 +30,14 @@ class MosquitoAlertDatasetv0(BaseDataset):
         labels = self.annotations_df["class_label"].values
         
         # convert labels to integers
-        word_to_integer = {}
+        self.word_to_integer = {}
 
         # Assign unique integer values to each word
         for i, word in enumerate(np.unique(labels)):
-            word_to_integer[word] = i
+            self.word_to_integer[word] = i
             
         # Convert all words to integers
-        labels = list(map(lambda x: word_to_integer[x], labels))
+        labels = list(map(lambda x: self.word_to_integer[x], labels))
         
         # convert all images to absolute paths
         filenames = list(map(lambda x: os.path.join(cfg.data_dir, self.images_folder, x), filenames))
@@ -45,16 +48,24 @@ class MosquitoAlertDatasetv0(BaseDataset):
     @lru_cache(maxsize=1000000)
     def load_image(self, filename):
         return PIL.Image.open(filename).convert("RGB")
+    
+    @property
+    def num_classes(self) -> int:
+        return len(self.word_to_integer)
         
     def __getitem__(self, index) -> Any:
         filename, bbox, label = self.data[index]
         image = self.load_image(filename)
         image = np.array(image)
         
+        target = {}
+        target["boxes"] = [bbox]
+        target["labels"] = [label]
+        
         if self.transform is not None:
-            image, bbox = self.transform(image, bbox, label)
+            image, target = self.transform(image, target)
             
-        return image, bbox, label
+        return image, target
     
     def __len__(self) -> int:
         return len(self.data)

@@ -7,16 +7,59 @@ from omegaconf import DictConfig, OmegaConf
 from hydra.core.hydra_config import HydraConfig
 
 import torch
+
+from mosquito.models import models
 from mosquito.transforms import transforms
 from mosquito.datasets import datasets
-
 from mosquito.helpers import get_dir, time_activity
 
-def train_one_epoch(dataloader, model, optimizer, device, epoch, log_freq=10):
-    pass
+def train_one_epoch(dataloader, model, optimizers, device, log_freq):
+    model.train()
+    
+    for i, batch in enumerate(dataloader):
+        for optimizer in optimizers:
+            optimizer.zero_grad()
+            
+        img, target = batch
+        
+        # filter out images without annotations and move to device
+        keep = set([i for i in range(len(target)) if len(target[i]["boxes"]) > 0])
+        img = [img[i].to(device) for i in range(len(img)) if i in keep]
+        target = [{k: v.to(device) for k, v in target[i].items()} for i in range(len(target)) if i in keep]
+
+        loss_dict = model(img, target)
+        loss = sum(loss for loss in loss_dict.values())
+        loss.backward()
+            
+        for optimizer in optimizers:
+            optimizer.step()
+            
+        if i % log_freq == 0:
+            logging.info(f"Iteration {i} - Loss: {loss.item()}")
+
+
 
 def evaluate(dataloader, model, device):
-    pass
+    model.eval()
+    
+    total_loss = 0
+    
+    for _, batch in enumerate(dataloader):
+            
+        img, target = batch
+    
+        # filter out images without annotations and move to device
+        keep = set([i for i in range(len(target)) if len(target[i]["boxes"]) > 0])
+        img = [img[i].to(device) for i in range(len(img)) if i in keep]
+        target = [{k: v.to(device) for k, v in target[i].items()} for i in range(len(target)) if i in keep]
+
+        with torch.no_grad():
+            loss_dict = model(img, target)
+            loss = sum(loss for loss in loss_dict.values())
+            
+        total_loss += loss.item()
+    
+    logging.info(f"Validation Loss: {total_loss / len(dataloader)}")
 
 
 @hydra.main(version_base=None, config_path=None)
@@ -82,8 +125,9 @@ def train(cfg: DictConfig):
             collate_fn=datasets[cfg.dataset_name].collate_fn
         )
         
-    # create model
-    # model = models[cfg.model_name](cfg)
+    # create model and optimizers
+    model = models[cfg.model_name](cfg, train_dataset.num_classes).to(device)
+    optimizers = model.configure_optimizers()
     
     with time_activity("Training"):
         
@@ -92,25 +136,24 @@ def train(cfg: DictConfig):
             with time_activity("Epoch {}".format(epoch + 1)):
                 
                 # train for one epoch
-                for batch in train_dataloader:
-                    # train_one_epoch(
-                    #     train_dataloader, 
-                    #     model, 
-                    #     optimizer, 
-                    #     device, 
-                    #     epoch, 
-                    #     log_freq=cfg.log_freq
-                    # )
-                    break
+                train_one_epoch(
+                    train_dataloader,
+                    model, 
+                    optimizers, 
+                    device,
+                    log_freq=cfg.log_freq
+                )
                     
                 # evaluate on the val dataset
                 if val_dataloader is not None:
-                    # evaluate(
-                    #     val_dataloader,
-                    #     model,
-                    #     device,
-                    # )
-                    break
+                    evaluate(
+                        val_dataloader,
+                        model,
+                        device,
+                    )
+                    
+    # save model
+    torch.save(model.state_dict(), os.path.join(output_dir, "model.pth"))
                 
 if __name__ == "__main__":
     train()

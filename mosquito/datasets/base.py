@@ -13,6 +13,10 @@ class BaseDataset(torch.utils.data.Dataset):
     def __len__(self) -> int:
         raise NotImplementedError
     
+    @property
+    def num_classes(self) -> int:
+        raise NotImplementedError
+    
     @staticmethod
     def get_train_and_val_dataset(cfg: DictConfig, tranform: Optional[callable] = None):
         raise NotImplementedError

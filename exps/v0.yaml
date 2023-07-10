@@ -1,13 +1,23 @@
 # data
-dataset_name: mosquito_alert_v0
+dataset_name: mosquito_alert_v0 # check mosquito/datasets/__init__.py
 data_dir: data
-batch_size: 32
+batch_size: 8
 
 # data augmentation
-transform_name: mosquito_alert_v0
-input_size: 224
+transform_name: mosquito_alert_v0 # check mosquito/transforms/__init__.py
+input_size: 96
 
 # optimization
 num_epochs: 1
+learning_rate: 3e-4
+momentum: 0.996
+weight_decay: 5e-4
+
+# model
+model_name: faster_rcnn # check mosquito/models/__init__.py
+hidden_layer_size: 96
+
+# logging
+log_freq: 10
 
 seed: 1

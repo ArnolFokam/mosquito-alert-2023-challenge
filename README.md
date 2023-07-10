@@ -48,43 +48,70 @@ class MosquitoAlertDataset(BaseDataset):
                  cfg,
                  transform: Optional[callable] = None) -> None:
         super().__init__(cfg)
-    # dataset loading logic...
+    # dataset's logic...
 ```
 
-Here are the required methods. See [BaseDataset](/mosquito/datasets/base.py#L6).
+Here are the required methods  and property. See [BaseDataset](/mosquito/datasets/base.py#L6).
 
 - `__init__`: Loads the data using the configurations in `cfg` and transform pipeline (see [section](#create-a-transform-pipeline)).
+- `num_classes`(property): Number of classes in our dataset
 - `__getitem__`: Returns a single data sample for model training.
 - `__len__`: Returns the number of samples in the data.
-- `get_train_and_val_dataset`: Returns a tuple of dataset objects (from your class). One for *training* and the other for *validation*. You can return a null value on the second element of the tuple if you do not wish to have a *validation* dataset.
+- `get_train_and_val_dataset`(staticmethod): Returns a tuple of dataset objects (from your class). One for *training* and the other for *validation*. You can return a null value on the second element of the tuple if you do not wish to have a *validation* dataset.
     ```python
     @staticmethod
     def get_train_and_val_dataset(cfg, transfrom):
         train_dataset = # dataset object creation logic
         return train dataset, None
     ```
-- `collate_fn`: Returns a collated version of the batch of samples. Check this [link](https://pytorch.org/docs/stable/data.html#dataloader-collate-fn) to learn more.
+- `collate_fn` (staticmethod): Returns a collated version of the batch of samples. Check this [link](https://pytorch.org/docs/stable/data.html#dataloader-collate-fn) to learn more.
 
 Note:  You are free to add additional methods to your classes.
+
+Do not forget to add your dataset class [here](/mosquito/datasets/__init__.py).
 
 ### Create a Transform Pipeline
 
 All transforms should be created in this [folder](/mosquito/transforms/). Here is a template to get you start.
 
 ```python
-class MosquitoAlertTransform(BaseDataset):
+class MosquitoAlertTransform(BaseTransform):
     def __init__(self, 
                  cfg,) -> None:
         super().__init__(cfg)
-    # transform loading logic...
+    # transform's logic...
 ```
 
-Here are the required methods. See [BaseDataset](/mosquito/datasets/base.py#L6).
+Here are the required methods. See [BaseTransform](/mosquito/transforms/base.py#L6).
 
 - `__init__`: Creates the transform pipeline (you could use [torchvision.transforms](https://pytorch.org/vision/stable/transforms.html) or [albumentations](https://albumentations.ai/)). The choice is up to you.
 - `__call__`: Receives a Numpy iamge array and a bounding boxe to return a tuple of two torch tensors. One being the tensor of the transformed image and the other being the tensor of the transformed bounding box.
 
 Note:  You are free to add additional methods to your transforms.
+
+Do not forget to add your transform class [here](/mosquito/transforms/__init__.py).
+
+### Create a Model
+
+All models should be created in this [folder](/mosquito/models/). Here is a template to get you start.
+
+```python
+class MosquitoAlertModel(BaseModel):
+    def __init__(self, 
+                 cfg,) -> None:
+        super().__init__(cfg)
+    # model's logic...
+```
+
+Here are the required methods. See [BaseModel](/mosquito//models/base.py#).
+
+- `__init__`: Creates the architecture of the model.
+- `__forward__`: Receives a batch of tensor images and outputs a tensor of bounding boxes and softmax distribution over classes for each bounding box.
+- `configure_optimizers`: Returns a list of optimizers. You can just return a list with a single optimizer if all the parameters of the model should be optimized the same way.
+
+Note:  You are free to add additional methods to your model.
+
+Do not forget to add your model class [here](/mosquito/models/__init__.py).
 
 ## TIPS
 - You can easily add -> commit -> push with this helper command `make push commit="your commit messsage"`
