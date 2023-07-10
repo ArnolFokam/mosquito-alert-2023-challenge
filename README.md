@@ -32,7 +32,6 @@ All datasets should be created in this [folder](/mosquito/datasets/). Here is a 
 
 ```python
 class MosquitoAlert:
-    class MosquitoAlert:
     def __init__(self, cfg) -> None:
         raise NotImplementedError
     
