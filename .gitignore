@@ -341,3 +341,4 @@ tags
 
 # User-defined ignores
 data/
+*_private/

@@ -18,7 +18,8 @@ pip install -r requirements.txt
 
 ```bash
 aicrowd login
-mkdir data && cd data && aicrowd dataset download --challenge mosquitoalert-challenge-2023 && unzip -qq test_images_phase1.zip -d test_images_phase1/
+mkdir data && cd data && aicrowd dataset download --challenge mosquitoalert-challenge-2023
+unzip -qq test_images_phase1.zip -d test_images_phase1/ && unzip -qq train_images.zip -d train_images/
 ```
 
 Note: you can also download the dataset manually at this [link](https://www.aicrowd.com/challenges/mosquitoalert-challenge-2023/dataset_files).
@@ -64,3 +65,4 @@ Note:  You are free to add additional methods to your classes.
 
 ## TIPS
 - You can easily add -> commit -> push with this helper command `make push commit="your commit messsage"`
+- You can prevent any file or folder in you local version of the repository from being push to the remote version by adding the suffix ```_private``` to its name.
