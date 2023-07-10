@@ -48,8 +48,8 @@ class MosquitoAlert:
 
 Here is the specifications for each required datasets method.
 
-- `__init__`: Should load the data using the configurations in `cfg`.
-- `__getitem__`: Should return a single data sample used to train the model.
+- `__init__`: Loads the data using the configurations in `cfg`.
+- `__getitem__`: Returns a single data sample used to train the model.
 - `__len__`: Returns the number of samples in the data.
 - `get_train_and_test_dataset`: Returns two dataset object (from your class). One for *training* and the other for *validation*.
 
