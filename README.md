@@ -56,7 +56,7 @@ Here are the required methods. See [BaseDataset](/mosquito/datasets/base.py#L6).
         train_dataset = # dataset object creation logic
         return train dataset, None
     ```
-- `collate_fn`: Returns a collated version of the batch of samples. Check this [link](https://pytorch.org/docs/stable/data.html#dataloader-collate-fn) to learn more about `collate_fn`.
+- `collate_fn`: Returns a collated version of the batch of samples. Check this [link](https://pytorch.org/docs/stable/data.html#dataloader-collate-fn) to learn more.
 
 Note:  You are free to add additional methods to your classes.
 
