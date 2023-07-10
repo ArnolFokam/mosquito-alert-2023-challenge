@@ -52,6 +52,7 @@ def train(cfg: DictConfig):
     
     # get train and val datasets
     train_dataset, val_dataset = datasets[cfg.dataset_name].get_train_and_val_dataset(cfg)
+    print(train_dataset[0])
 
 if __name__ == "__main__":
     train()
