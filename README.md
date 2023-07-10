@@ -106,7 +106,7 @@ class MosquitoAlertModel(BaseModel):
 Here are the required methods. See [BaseModel](/mosquito//models/base.py#).
 
 - `__init__`: Creates the architecture of the model.
-- `__forward__`: Receives a batch of tensor images and outputs a tensor of bounding boxes and softmax distribution over classes for each bounding box.
+- `forward`: Receives a batch of tensor images and bounding box and returns a dictionary of losses (See [website](https://pytorch.org/vision/main/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn.html#torchvision.models.detection.fasterrcnn_resnet50_fpn)).
 - `configure_optimizers`: Returns a list of optimizers. You can just return a list with a single optimizer if all the parameters of the model should be optimized the same way.
 
 Note:  You are free to add additional methods to your model.
