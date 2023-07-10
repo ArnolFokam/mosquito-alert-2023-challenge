@@ -51,9 +51,17 @@ Here is the specifications for each required datasets method.
 - `__init__`: Loads the data using the configurations in `cfg`.
 - `__getitem__`: Returns a single data sample for model training.
 - `__len__`: Returns the number of samples in the data.
-- `get_train_and_test_dataset`: Returns two dataset object (from your class). One for *training* and the other for *validation*.
+- `get_train_and_test_dataset`: Returns a tuple of dataset objects (from your class). One for *training* and the other for *validation*. You can return a null value on the second element of the tuple if you do not wish to have a *validation* dataset.
+    ```python
+    @staticmethod
+    def get_train_and_val_dataset(cfg):
+        train_dataset = # dataset creation logic
+        return train dataset, None
+    ```
 
-Note: you can add additional methods to your class if you wish. Just make sure the required methods are also implemented.
+Note: 
+- You can add additional methods to your class if you wish. Just make sure the required methods are also implemented.
+- 
 
 
 ## TIPS
