@@ -18,8 +18,11 @@ pip install -r requirements.txt
 
 ```bash
 aicrowd login
-mkdir data && cd data && aicrowd dataset download --challenge mosquitoalert-challenge-2023
-unzip -qq test_images_phase1.zip -d test_images_phase1/ && unzip -qq train_images.zip -d train_images/
+
+cd # [repository directory]
+mkdir data && aicrowd dataset download --challenge mosquitoalert-challenge-2023 -o data/
+unzip -qq data/test_images_phase1.zip -d test_images_phase1/
+unzip -qq data/train_images.zip -d train_images/
 ```
 
 Note: you can also download the dataset manually at this [link](https://www.aicrowd.com/challenges/mosquitoalert-challenge-2023/dataset_files).
@@ -37,22 +40,26 @@ See [tips](#tips) for shorcut command
 
 ### Create a Pytorch Dataset Module
 
-All datasets should be created in this [folder](/mosquito/datasets/). Here is a template to get you start.
+All datasets should be created in this [folder](/mosquito/datasets/). Here is a template to get you started.
 
 ```python
-class MosquitoAlert(BaseDataset):
-    # dataset logic
+class MosquitoAlertDataset(BaseDataset):
+    def __init__(self, 
+                 cfg,
+                 transform: Optional[callable] = None) -> None:
+        super().__init__(cfg)
+    # dataset loading logic...
 ```
 
 Here are the required methods. See [BaseDataset](/mosquito/datasets/base.py#L6).
 
-- `__init__`: Loads the data using the configurations in `cfg`.
+- `__init__`: Loads the data using the configurations in `cfg` and transform pipeline (see [section](#create-a-transform-pipeline)).
 - `__getitem__`: Returns a single data sample for model training.
 - `__len__`: Returns the number of samples in the data.
 - `get_train_and_val_dataset`: Returns a tuple of dataset objects (from your class). One for *training* and the other for *validation*. You can return a null value on the second element of the tuple if you do not wish to have a *validation* dataset.
     ```python
     @staticmethod
-    def get_train_and_val_dataset(cfg):
+    def get_train_and_val_dataset(cfg, transfrom):
         train_dataset = # dataset object creation logic
         return train dataset, None
     ```
@@ -60,6 +67,24 @@ Here are the required methods. See [BaseDataset](/mosquito/datasets/base.py#L6).
 
 Note:  You are free to add additional methods to your classes.
 
+### Create a Transform Pipeline
+
+All transforms should be created in this [folder](/mosquito/transforms/). Here is a template to get you start.
+
+```python
+class MosquitoAlertTransform(BaseDataset):
+    def __init__(self, 
+                 cfg,) -> None:
+        super().__init__(cfg)
+    # transform loading logic...
+```
+
+Here are the required methods. See [BaseDataset](/mosquito/datasets/base.py#L6).
+
+- `__init__`: Creates the transform pipeline (you could use [torchvision.transforms](https://pytorch.org/vision/stable/transforms.html) or [albumentations](https://albumentations.ai/)). The choice is up to you.
+- `__call__`: Receives a Numpy iamge array and a bounding boxe to return a tuple of two torch tensors. One being the tensor of the transformed image and the other being the tensor of the transformed bounding box.
+
+Note:  You are free to add additional methods to your transforms.
 
 ## TIPS
 - You can easily add -> commit -> push with this helper command `make push commit="your commit messsage"`

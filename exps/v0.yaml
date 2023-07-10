@@ -1,7 +1,11 @@
-#data
+# data
 dataset_name: mosquito_alert_v0
 data_dir: data
 batch_size: 32
+
+# data augmentation
+transform_name: mosquito_alert_v0
+input_size: 224
 
 # optimization
 num_epochs: 1

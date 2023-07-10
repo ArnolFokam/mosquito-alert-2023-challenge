@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Any, Optional
 from omegaconf import DictConfig
 
 import torch
 
 class BaseDataset(torch.utils.data.Dataset):
     def __init__(self, cfg: DictConfig) -> None:
-        raise NotImplementedError
+        self.cfg = cfg
     
     def __getitem__(self, index) -> Any:
         raise NotImplementedError
@@ -14,7 +14,7 @@ class BaseDataset(torch.utils.data.Dataset):
         raise NotImplementedError
     
     @staticmethod
-    def get_train_and_val_dataset(cfg: DictConfig):
+    def get_train_and_val_dataset(cfg: DictConfig, tranform: Optional[callable] = None):
         raise NotImplementedError
     
     @staticmethod

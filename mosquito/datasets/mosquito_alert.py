@@ -1,21 +1,21 @@
-from functools import lru_cache
-import logging
 import os
 import PIL.Image
 import numpy as np
 import pandas as pd
+from functools import lru_cache
 from typing import Any, Optional
 from mosquito.datasets.base import BaseDataset
 
 
-class MosquitoAlertv0(BaseDataset):
+class MosquitoAlertDatasetv0(BaseDataset):
     images_folder: str = "train_images/"
     labels_csv_file: str = "train.csv"
     
     def __init__(self, 
                  cfg,
                  transform: Optional[callable] = None) -> None:
-        self.cfg = cfg
+        super().__init__(cfg)
+        
         self.transform = transform
         
         # get the csv annotations file
@@ -49,9 +49,10 @@ class MosquitoAlertv0(BaseDataset):
     def __getitem__(self, index) -> Any:
         filename, bbox, label = self.data[index]
         image = self.load_image(filename)
+        image = np.array(image)
         
         if self.transform is not None:
-            image, bbox = self.transform(image, bbox)
+            image, bbox = self.transform(image, bbox, label)
             
         return image, bbox, label
     
@@ -59,8 +60,8 @@ class MosquitoAlertv0(BaseDataset):
         return len(self.data)
     
     @staticmethod
-    def get_train_and_val_dataset(cfg):
-        dataset = MosquitoAlertv0(cfg)
+    def get_train_and_val_dataset(cfg, transform=None):
+        dataset = MosquitoAlertDatasetv0(cfg, transform)
         return dataset, None
     
     @staticmethod

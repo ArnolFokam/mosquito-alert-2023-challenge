@@ -7,6 +7,7 @@ from omegaconf import DictConfig, OmegaConf
 from hydra.core.hydra_config import HydraConfig
 
 import torch
+from mosquito.transforms import transforms
 from mosquito.datasets import datasets
 
 from mosquito.helpers import get_dir, time_activity
@@ -57,7 +58,10 @@ def train(cfg: DictConfig):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     # get train and val datasets
-    train_dataset, val_dataset = datasets[cfg.dataset_name].get_train_and_val_dataset(cfg)
+    train_dataset, val_dataset = datasets[cfg.dataset_name].get_train_and_val_dataset(
+        cfg,
+        transform=transforms[cfg.dataset_name](cfg)
+    )
     train_dataloader, val_dataloader = None, None
     
     # create data loaders
