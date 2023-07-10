@@ -42,10 +42,9 @@ All datasets should be created in this [folder](/mosquito/datasets/). Here is a 
 ```python
 class MosquitoAlert(BaseDataset):
     # dataset logic
-    
 ```
 
-Here is the specifications for each required datasets method. See [BaseDataset](/mosquito/datasets/base.py#L6).
+Here are the required methods. See [BaseDataset](/mosquito/datasets/base.py#L6).
 
 - `__init__`: Loads the data using the configurations in `cfg`.
 - `__getitem__`: Returns a single data sample for model training.
