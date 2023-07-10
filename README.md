@@ -32,15 +32,29 @@ All datasets should be created in this [folder](/mosquito/datasets/). Here is a 
 
 ```python
 class MosquitoAlert:
-    def __init__(self) -> None:
-        pass
+    class MosquitoAlert:
+    def __init__(self, cfg) -> None:
+        raise NotImplementedError
     
     def __getitem__(self) -> Any:
-        pass
+        raise NotImplementedError
     
     def __len__(self) -> int:
-        pass
+        raise NotImplementedError
+    
+    @staticmethod
+    def get_train_and_test_dataset(cfg):
+        raise NotImplementedError
 ```
+
+Here is the specifications for each required datasets method.
+
+- `__init__`: Should load the data using the configurations in `cfg`.
+- `__getitem__`: Should return a single data sample used to train the model.
+- `__len__`: Returns the number of samples in the data.
+- `get_train_and_test_dataset`: Returns two dataset object (from your class). One for *training* and the other for *validation*.
+
+Note: you can add additional methods to your class if you wish. Just make sure the required methods are also implemented.
 
 
 ## TIPS
