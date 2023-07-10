@@ -1,0 +1,4 @@
+aicrowd-cli==0.1.15
+pytorch==2.0.1
+torchvision==0.11.1
+torchvision==0.15.2
