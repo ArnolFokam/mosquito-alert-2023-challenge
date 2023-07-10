@@ -24,3 +24,5 @@ mkdir data && cd data && aicrowd dataset download --challenge mosquitoalert-chal
 Note: you can also download the dataset manually at this [link](https://www.aicrowd.com/challenges/mosquitoalert-challenge-2023/dataset_files).
 
 
+## TIPS
+- You can easily add -> commit -> push with this helper command `make push "you commit message"`
