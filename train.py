@@ -9,7 +9,13 @@ from hydra.core.hydra_config import HydraConfig
 import torch
 from mosquito.datasets import datasets
 
-from mosquito.helpers import get_dir
+from mosquito.helpers import get_dir, time_activity
+
+def train_one_epoch(dataloader, model, optimizer, device, epoch, log_freq=10):
+    pass
+
+def evaluate(dataloader, model, device):
+    pass
 
 
 @hydra.main(version_base=None, config_path=None)
@@ -52,7 +58,55 @@ def train(cfg: DictConfig):
     
     # get train and val datasets
     train_dataset, val_dataset = datasets[cfg.dataset_name].get_train_and_val_dataset(cfg)
-    print(train_dataset[0])
-
+    train_dataloader, val_dataloader = None, None
+    
+    # create data loaders
+    train_dataloader = torch.utils.data.DataLoader(
+        train_dataset, 
+        batch_size=cfg.batch_size, 
+        shuffle=True, 
+        num_workers=8,
+        collate_fn=datasets[cfg.dataset_name].collate_fn
+    )
+    
+    if val_dataset is not None:
+        val_dataloader = torch.utils.data.DataLoader(
+            val_dataset, 
+            batch_size=1, 
+            shuffle=False, 
+            num_workers=8,
+            collate_fn=datasets[cfg.dataset_name].collate_fn
+        )
+        
+    # create model
+    # model = models[cfg.model_name](cfg)
+    
+    with time_activity("Training"):
+        
+        for epoch in range(cfg.num_epochs):
+            
+            with time_activity("Epoch {}".format(epoch + 1)):
+                
+                # train for one epoch
+                for batch in train_dataloader:
+                    # train_one_epoch(
+                    #     train_dataloader, 
+                    #     model, 
+                    #     optimizer, 
+                    #     device, 
+                    #     epoch, 
+                    #     log_freq=cfg.log_freq
+                    # )
+                    break
+                    
+                # evaluate on the val dataset
+                if val_dataloader is not None:
+                    # evaluate(
+                    #     val_dataloader,
+                    #     model,
+                    #     device,
+                    # )
+                    break
+                
 if __name__ == "__main__":
     train()

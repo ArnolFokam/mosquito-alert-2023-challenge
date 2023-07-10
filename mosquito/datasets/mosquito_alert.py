@@ -62,5 +62,9 @@ class MosquitoAlertv0(BaseDataset):
     def get_train_and_val_dataset(cfg):
         dataset = MosquitoAlertv0(cfg)
         return dataset, None
+    
+    @staticmethod
+    def collate_fn(batch):
+        return tuple(zip(*batch))
         
         

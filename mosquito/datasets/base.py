@@ -16,3 +16,7 @@ class BaseDataset(torch.utils.data.Dataset):
     @staticmethod
     def get_train_and_val_dataset(cfg: DictConfig):
         raise NotImplementedError
+    
+    @staticmethod
+    def collate_fn(batch):
+        raise NotImplementedError

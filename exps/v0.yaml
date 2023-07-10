@@ -1,5 +1,9 @@
 #data
 dataset_name: mosquito_alert_v0
 data_dir: data
+batch_size: 32
+
+# optimization
+num_epochs: 1
 
 seed: 1
