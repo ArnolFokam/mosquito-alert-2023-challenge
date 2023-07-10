@@ -341,4 +341,5 @@ tags
 
 # User-defined ignores
 data/
+outputs/
 *_private/

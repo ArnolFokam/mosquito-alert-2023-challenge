@@ -1,13 +1,6 @@
-"""
-class MosquitoAlert:
-    def __init__(self) -> None:
-        pass
-    
-    def __getitem__(self) -> Any:
-        pass
-    
-    def __len__(self) -> int:
-        pass
-"""
+from mosquito.datasets.mosquito_alert import MosquitoAlertv0
 
-datasets = {}
+
+datasets = {
+    "mosquito_alert_v0": MosquitoAlertv0
+}

@@ -27,27 +27,25 @@ Note: you can also download the dataset manually at this [link](https://www.aicr
 
 ## HowTo
 
+### Perform a Training Experiment
+
+1. Create a `yaml` configuration for the training experiment in [exps](/exps/). Then, run this command.
+
+```python train.py --config-path=exps --config-name=[config filename]```
+
+See [tips](#tips) for shorcut command
+
 ### Create a Pytorch Dataset Module
 
 All datasets should be created in this [folder](/mosquito/datasets/). Here is a template to get you start.
 
 ```python
-class MosquitoAlert:
-    def __init__(self, cfg) -> None:
-        raise NotImplementedError
+class MosquitoAlert(BaseDataset):
+    # dataset logic
     
-    def __getitem__(self) -> Any:
-        raise NotImplementedError
-    
-    def __len__(self) -> int:
-        raise NotImplementedError
-    
-    @staticmethod
-    def get_train_and_val_dataset(cfg):
-        raise NotImplementedError
 ```
 
-Here is the specifications for each required datasets method.
+Here is the specifications for each required datasets method. See [BaseDataset](/mosquito/datasets/base.py).
 
 - `__init__`: Loads the data using the configurations in `cfg`.
 - `__getitem__`: Returns a single data sample for model training.
@@ -66,3 +64,4 @@ Note:  You are free to add additional methods to your classes.
 ## TIPS
 - You can easily add -> commit -> push with this helper command `make push commit="your commit messsage"`
 - You can prevent any file or folder in you local version of the repository from being push to the remote version by adding the suffix ```_private``` to its name.
+- You can use the following shorcut command to train model `make train exp=[configurarion filename]`.
