@@ -25,4 +25,4 @@ Note: you can also download the dataset manually at this [link](https://www.aicr
 
 
 ## TIPS
-- You can easily add -> commit -> push with this helper command `make push "you commit message"`
+- You can easily add -> commit -> push with this helper command `make push commit="your commit messsage"`
