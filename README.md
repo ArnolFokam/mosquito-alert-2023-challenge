@@ -85,7 +85,7 @@ class MosquitoAlertTransform(BaseTransform):
 Here are the required methods. See [BaseTransform](/mosquito/transforms/base.py#L6).
 
 - `__init__`: Creates the transform pipeline (you could use [torchvision.transforms](https://pytorch.org/vision/stable/transforms.html) or [albumentations](https://albumentations.ai/)). The choice is up to you.
-- `__call__`: Receives a Numpy iamge array and a bounding boxe to return a tuple of two torch tensors. One being the tensor of the transformed image and the other being the tensor of the transformed bounding box.
+- `__call__`: Receives a Numpy image array and a bounding box to return a tuple of two torch tensors. One being the tensor of the transformed image and the other being the tensor of the transformed bounding box.
 
 Note:  You are free to add additional methods to your transforms.
 
