@@ -85,7 +85,7 @@ class MosquitoAlertTransform(BaseTransform):
 Here are the required methods. See [BaseTransform](/mosquito/transforms/base.py#L6).
 
 - `__init__`: Creates the transform pipeline (you could use [torchvision.transforms](https://pytorch.org/vision/stable/transforms.html) or [albumentations](https://albumentations.ai/)). The choice is up to you.
-- `__call__`: Receives a Numpy image array and a bounding box to return a tuple of two torch tensors. One being the tensor of the transformed image and the other being the tensor of the transformed bounding box.
+- `__call__`: Receives a Numpy image array and a bounding box to return a tuple consisting of a transformed tensor image and the target values according to the requirement of the model you created using this [section](#create-a-model).
 
 Note:  You are free to add additional methods to your transforms.
 
@@ -106,7 +106,7 @@ class MosquitoAlertModel(BaseModel):
 Here are the required methods. See [BaseModel](/mosquito//models/base.py#).
 
 - `__init__`: Creates the architecture of the model.
-- `forward`: Receives a batch of tensor images and bounding box and returns a dictionary of losses (See [website](https://pytorch.org/vision/main/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn.html#torchvision.models.detection.fasterrcnn_resnet50_fpn)).
+- `forward`: Receives a batch of tensor images and bounding box and returns a dictionary of losses (See [website](https://pytorch.org/vision/main/models/generated/torchvision.models.detection.fasterrcnn_resnet50_fpn.html#torchvision.models.detection.fasterrcnn_resnet50_fpn) for help).
 - `configure_optimizers`: Returns a list of optimizers. You can just return a list with a single optimizer if all the parameters of the model should be optimized the same way.
 
 Note:  You are free to add additional methods to your model.
