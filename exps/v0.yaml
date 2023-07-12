@@ -1,7 +1,7 @@
 # data
 dataset_name: mosquito_alert_v0 # check mosquito/datasets/__init__.py
 data_dir: data
-batch_size: 1024
+batch_size: 64
 
 # data augmentation
 transform_name: mosquito_alert_v0 # check mosquito/transforms/__init__.py
