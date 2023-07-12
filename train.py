@@ -154,6 +154,8 @@ def train(cfg: DictConfig):
                     
     # save model
     torch.save(model.state_dict(), os.path.join(output_dir, "model.pth"))
+    
+    logging.info(f"model saved at {output_dir}")
                 
 if __name__ == "__main__":
     train()
