@@ -6,6 +6,8 @@
 
 This process assumes you have create an python virtual environment with [conda](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) or [virtualenv](https://docs.python.org/3/library/venv.html)
 
+Note: you must be in the repository's directory to follow these steps.
+
 ### 1. Install Dependencies
 
 ```bash
@@ -19,7 +21,6 @@ pip install -r requirements.txt
 ```bash
 aicrowd login
 
-cd # [repository directory]
 mkdir data && aicrowd dataset download --challenge mosquitoalert-challenge-2023 -o data/
 unzip -qq data/test_images_phase1.zip -d test_images_phase1/
 unzip -qq data/train_images.zip -d train_images/
