@@ -45,7 +45,7 @@ class MosquitoAlertDatasetv0(BaseDataset):
         # zip all the data together
         self.data = list(zip(filenames, bboxes, labels))
         
-    @lru_cache(maxsize=1000000)
+    @lru_cache(maxsize=100000)
     def load_image(self, filename):
         return PIL.Image.open(filename).convert("RGB")
     
