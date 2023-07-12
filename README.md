@@ -22,8 +22,8 @@ pip install -r requirements.txt
 aicrowd login
 
 mkdir data && aicrowd dataset download --challenge mosquitoalert-challenge-2023 -o data/
-unzip -qq data/test_images_phase1.zip -d test_images_phase1/
-unzip -qq data/train_images.zip -d train_images/
+unzip -qq data/test_images_phase1.zip -d data/test_images_phase1/
+unzip -qq data/train_images.zip -d data/train_images/
 ```
 
 Note: you can also download the dataset manually at this [link](https://www.aicrowd.com/challenges/mosquitoalert-challenge-2023/dataset_files).
