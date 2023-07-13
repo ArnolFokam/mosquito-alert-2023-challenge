@@ -10,16 +10,14 @@ class MosquitoAlertTransformv0(BaseTransform):
     def __init__(self, cfg) -> None:
         super().__init__(cfg)
         
-        # TODO: Intelligent cropping A.RandomCrop(width=self.cfg.input_size, height=self.cfg.input_size),
-        
         self.transform = A.Compose([
             A.Resize(width=self.cfg.input_size, height=self.cfg.input_size),
             A.HorizontalFlip(p=0.5),
             A.RandomBrightnessContrast(p=0.2),
             albumentations.pytorch.ToTensorV2()
         ], bbox_params=A.BboxParams(format='pascal_voc', 
-                                    min_area=0.01, 
-                                    min_visibility=0.1,
+                                    min_area=0.001, 
+                                    min_visibility=0.05,
                                     label_fields=['labels'])
         )
     
