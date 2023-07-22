@@ -16,8 +16,8 @@ class MosquitoAlertTransformv0(BaseTransform):
             A.RandomBrightnessContrast(p=0.2),
             albumentations.pytorch.ToTensorV2()
         ], bbox_params=A.BboxParams(format='pascal_voc', 
-                                    min_area=0.01, 
-                                    min_visibility=0.1,
+                                    min_area=0.001, 
+                                    min_visibility=0.05,
                                     label_fields=['labels'])
         )
     
