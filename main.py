@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import hydra
 import random
 import numpy as np
@@ -9,14 +10,16 @@ from hydra.core.hydra_config import HydraConfig
 import torch
 
 from mosquito.models import models
-from mosquito.transforms import transforms
 from mosquito.datasets import datasets
-from mosquito.helpers import get_dir, time_activity
+from mosquito.transforms import transforms
+from mosquito.helpers import get_dir, get_new_run_dir_params, has_valid_hydra_dir_params, time_activity, log
 
-def train_one_epoch(dataloader, model, optimizers, device, log_freq):
+def train_one_epoch(dataloader, model, optimizers, device, log_every_n_steps, epoch, results_dir):
     model.train()
     
+    total_loss, total_num = 0.0, 0
     for i, batch in enumerate(dataloader):
+        
         for optimizer in optimizers:
             optimizer.zero_grad()
             
@@ -30,16 +33,21 @@ def train_one_epoch(dataloader, model, optimizers, device, log_freq):
         loss_dict = model(img, target)
         loss = sum(loss for loss in loss_dict.values())
         loss.backward()
+        
+        total_loss += loss.item()
+        total_num += 1
             
         for optimizer in optimizers:
             optimizer.step()
-            
-        if i % log_freq == 0:
-            logging.info(f"Iteration {i} - Loss: {loss.item()}")
+        
+        global_step = max(epoch - 1, 0) * len(dataloader) + i + 1
+        if global_step % log_every_n_steps == 0:
+            logging.info(f"Epoch: {epoch} | Step: {global_step} | Loss: {loss.item()}")
+            log(results_dir, {"train-loss": total_loss / total_num}, step=global_step)
 
 
 
-def evaluate(dataloader, model, device):
+def evaluate(dataloader, model, device, results_dir, epoch):
     model.eval()
     
     total_loss = 0
@@ -58,12 +66,13 @@ def evaluate(dataloader, model, device):
             loss = sum(loss for loss in loss_dict.values())
             
         total_loss += loss.item()
-    
+    global_step = epoch * len(dataloader)
+    log(results_dir, {"train-loss": total_loss / len(dataloader)}, step=global_step)
     logging.info(f"Validation Loss: {total_loss / len(dataloader)}")
 
 
 @hydra.main(version_base=None, config_path=None)
-def train(cfg: DictConfig):
+def main(cfg: DictConfig):
     """Main training script"""
     
     # ensure reprodcibility 
@@ -92,6 +101,7 @@ def train(cfg: DictConfig):
     
     # initializing results dir
     output_dir = get_dir(HydraConfig.get().runtime.output_dir)
+    print(output_dir)
     
     # save configuration used at the folder location
     with open(os.path.join(output_dir, 'config.yaml'), 'w') as f:
@@ -141,7 +151,9 @@ def train(cfg: DictConfig):
                     model, 
                     optimizers, 
                     device,
-                    log_freq=cfg.log_freq
+                    log_every_n_steps =cfg.log_every_n_steps, 
+                    epoch=epoch, 
+                    results_dir=output_dir
                 )
                     
                 # evaluate on the val dataset
@@ -150,12 +162,19 @@ def train(cfg: DictConfig):
                         val_dataloader,
                         model,
                         device,
+                        epoch=epoch,
+                        results_dir=output_dir
                     )
                     
     # save model
     torch.save(model.state_dict(), os.path.join(output_dir, "model.pth"))
-    
     logging.info(f"model saved at {output_dir}")
                 
 if __name__ == "__main__":
-    train()
+    if has_valid_hydra_dir_params(sys.argv):
+        main()
+    else:
+        params = get_new_run_dir_params()
+        for param, value in params.items():
+            sys.argv.append(f"{param}={value}")
+    main()

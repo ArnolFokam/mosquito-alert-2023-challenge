@@ -344,3 +344,5 @@ data/
 outputs/
 *_private/
 .vscode/
+results/
+wandb/
