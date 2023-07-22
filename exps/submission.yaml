@@ -1,6 +1,6 @@
 defaults:
-  - base-tu # change this with you config file
+  - v0 # change this to training config filename (without the yaml)
   - _self_
 
 
-model_path:
+model_path: /mnt/data/home/manuel/mos/outputs/2023-07-12/19-25-36/model.pth

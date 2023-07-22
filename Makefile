@@ -6,4 +6,4 @@ push:
 	git push
 
 train:
-	python train.py --config-path=exps --config-name=$(exp)
+	ulimit -n 2048 && python train.py --config-path=exps --config-name=$(exp)
