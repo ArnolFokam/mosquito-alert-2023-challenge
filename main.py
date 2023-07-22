@@ -4,6 +4,7 @@ import sys
 import hydra
 import random
 import numpy as np
+from sklearn.metrics import f1_score
 from omegaconf import DictConfig, OmegaConf
 from hydra.core.hydra_config import HydraConfig
 
@@ -13,6 +14,24 @@ from mosquito.models import models
 from mosquito.datasets import datasets
 from mosquito.transforms import transforms
 from mosquito.helpers import get_dir, get_new_run_dir_params, has_valid_hydra_dir_params, time_activity, log
+
+def calculate_iou(boxA, boxB):
+    # Calculate the intersection area
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+    inter_area = max(0, xB - xA + 1) * max(0, yB - yA + 1)
+
+    # Calculate the union area
+    boxA_area = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
+    boxB_area = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
+    union_area = boxA_area + boxB_area - inter_area
+
+    # Calculate IoU
+    iou = inter_area / union_area
+    return iou
+
 
 def train_one_epoch(dataloader, model, optimizers, device, log_every_n_steps, epoch, results_dir):
     model.train()
@@ -46,9 +65,13 @@ def train_one_epoch(dataloader, model, optimizers, device, log_every_n_steps, ep
             log(results_dir, {"train-loss": total_loss / total_num}, step=global_step)
 
 
-
-def evaluate(dataloader, model, device, results_dir, epoch):
+def evaluate(dataloader, model, device, results_dir, epoch, global_step):
     model.eval()
+    
+    pred_boxes = []
+    true_boxes = []
+    pred_labels = []
+    true_labels = []
     
     for _, batch in enumerate(dataloader):
             
@@ -57,14 +80,43 @@ def evaluate(dataloader, model, device, results_dir, epoch):
         # filter out images without annotations and move to device
         keep = set([i for i in range(len(target)) if len(target[i]["boxes"]) > 0])
         img = [img[i].to(device) for i in range(len(img)) if i in keep]
+        
         targets = [{k: v.to(device) for k, v in target[i].items()} for i in range(len(target)) if i in keep]
 
         with torch.no_grad():
             outputs = model(img)
             outputs = [{k: v.to(torch.device('cpu')) for k, v in t.items()} for t in outputs]
-            res = {target["image_id"]: output for target, output in zip(targets, outputs)}
-            print(res)
-            break
+            outputs = {target["image_id"]: output for target, output in zip(targets, outputs)}
+            
+            # use the model's postprocess function to get the final predictions
+            res = model.postprocess(outputs)
+            
+            # format targets accordingly
+            targets = {target["image_id"]: target for target in targets}
+            
+            # collection predictions and ground truth
+            for image_id in res.keys():
+                # append boxes
+                pred_boxes.append(res[image_id]["boxes"][0].numpy())
+                true_boxes.append(targets[image_id]["boxes"][0].cpu().numpy())
+                
+                # append labels
+                pred_labels.append(res[image_id]["labels"].item())
+                true_labels.append(targets[image_id]["labels"].item())
+            
+    
+    macro_f1_score = f1_score(pred_labels, true_labels, average='macro')
+    
+    iou_scores = []
+    for i in range(len(pred_boxes)):
+        iou_scores.append(calculate_iou(pred_boxes[i], true_boxes[i]))
+        
+    mean_iou_score = np.mean(iou_scores)
+    
+    # log results
+    log(results_dir, {"val-macro-f1-score": macro_f1_score, "val-mean-iou-score": mean_iou_score}, step=global_step)
+    logging.info(f"Epoch: {epoch} | Step: {global_step} | Macro F1 Score: {macro_f1_score} | Mean IoU Score: {mean_iou_score}")
+        
             
 
 
@@ -98,7 +150,6 @@ def main(cfg: DictConfig):
     
     # initializing results dir
     output_dir = get_dir(HydraConfig.get().runtime.output_dir)
-    print(output_dir)
     
     # save configuration used at the folder location
     with open(os.path.join(output_dir, 'config.yaml'), 'w') as f:
@@ -117,7 +168,7 @@ def main(cfg: DictConfig):
     # create data loaders
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, 
-        batch_size=cfg.batch_size, 
+        batch_size=cfg.train_batch_size, 
         shuffle=True, 
         num_workers=8,
         collate_fn=datasets[cfg.dataset_name].collate_fn
@@ -126,14 +177,15 @@ def main(cfg: DictConfig):
     if val_dataset is not None:
         val_dataloader = torch.utils.data.DataLoader(
             val_dataset, 
-            batch_size=1, 
+            batch_size=cfg.eval_batch_size, 
             shuffle=False, 
             num_workers=8,
             collate_fn=datasets[cfg.dataset_name].collate_fn
         )
         
     # create model and optimizers
-    model = models[cfg.model_name](cfg, train_dataset.num_classes).to(device)
+    num_classes = train_dataset.dataset.num_classes if hasattr(train_dataset, "dataset") else train_dataset.num_classes
+    model = models[cfg.model_name](cfg, num_classes).to(device)
     optimizers = model.configure_optimizers()
     
     with time_activity("Training"):
@@ -149,7 +201,7 @@ def main(cfg: DictConfig):
                     optimizers, 
                     device,
                     log_every_n_steps =cfg.log_every_n_steps, 
-                    epoch=epoch, 
+                    epoch=epoch + 1, 
                     results_dir=output_dir
                 )
                     
@@ -159,7 +211,8 @@ def main(cfg: DictConfig):
                         val_dataloader,
                         model,
                         device,
-                        epoch=epoch,
+                        epoch=epoch + 1,
+                        global_step=(epoch + 1) * len(train_dataloader),
                         results_dir=output_dir
                     )
                     

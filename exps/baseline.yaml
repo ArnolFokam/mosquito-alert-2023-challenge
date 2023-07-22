@@ -4,7 +4,10 @@ experiment:
 # data
 dataset_name: mosquito_alert_v0 # check mosquito/datasets/__init__.py
 data_dir: data
-batch_size: 8
+train_batch_size: 8
+eval_batch_size: 8
+validation_split: 0.2
+default_label_index: 0
 
 # data augmentation
 transform_name: mosquito_alert_v0 # check mosquito/transforms/__init__.py
@@ -20,6 +23,10 @@ weight_decay: 5e-4
 # model
 model_name: faster_rcnn # check mosquito/models/__init__.py
 hidden_layer_size: 256
+
+# postprocessing
+iou_threshold: 0.5
+score_threshold: 0.3
 
 # logging
 log_every_n_steps: 100

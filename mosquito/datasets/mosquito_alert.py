@@ -5,6 +5,7 @@ import pandas as pd
 from functools import lru_cache
 from typing import Any, Optional
 from mosquito.datasets.base import BaseDataset
+from torch.utils.data import random_split
 
 # because some images are too large
 PIL.Image.MAX_IMAGE_PIXELS = 933120000
@@ -110,7 +111,7 @@ class MosquitoAlertDatasetv0(BaseDataset):
         target = {}
         target["boxes"] = [bbox]
         target["labels"] = [label]
-        target['image_id'] = filename
+        target['image_id'] = index
         
         if self.transform is not None:
             image, target = self.transform(image, target)
@@ -118,13 +119,19 @@ class MosquitoAlertDatasetv0(BaseDataset):
         return image, target
     
     def __len__(self) -> int:
-        # return len(self.data)
-        return 100
+        return len(self.data)
     
     @staticmethod
     def get_train_and_val_dataset(cfg, transform=None):
         dataset = MosquitoAlertDatasetv0(cfg, transform)
-        return dataset, None
+        
+        assert 0 <= cfg.validation_split <= 1.0
+        if cfg.validation_split == 0.0:
+            return dataset, None
+        else:
+            validation_size = int(cfg.validation_split * len(dataset))
+            train_size = len(dataset) - validation_size
+            return random_split(dataset, [train_size, validation_size])
     
     @staticmethod
     def collate_fn(batch):
