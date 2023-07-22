@@ -15,7 +15,7 @@ load_input_size: 224
 input_size: 96
 
 # optimization
-num_epochs: 2
+num_epochs: 10
 learning_rate: 3e-4
 momentum: 0.996
 weight_decay: 5e-4
