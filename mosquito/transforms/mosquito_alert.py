@@ -25,5 +25,6 @@ class MosquitoAlertTransformv0(BaseTransform):
         transformed = self.transform(image=image, bboxes=target["boxes"], labels=target["labels"])
         return transformed["image"].float() / 255., {
             "boxes":  torch.tensor(transformed["bboxes"], dtype=torch.float32), 
-            "labels": torch.tensor(transformed["labels"], dtype=torch.int64)
+            "labels": torch.tensor(transformed["labels"], dtype=torch.int64),
+            "image_id": target["image_id"],
         }

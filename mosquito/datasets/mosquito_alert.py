@@ -110,6 +110,7 @@ class MosquitoAlertDatasetv0(BaseDataset):
         target = {}
         target["boxes"] = [bbox]
         target["labels"] = [label]
+        target['image_id'] = filename
         
         if self.transform is not None:
             image, target = self.transform(image, target)
@@ -117,7 +118,8 @@ class MosquitoAlertDatasetv0(BaseDataset):
         return image, target
     
     def __len__(self) -> int:
-        return len(self.data)
+        # return len(self.data)
+        return 100
     
     @staticmethod
     def get_train_and_val_dataset(cfg, transform=None):

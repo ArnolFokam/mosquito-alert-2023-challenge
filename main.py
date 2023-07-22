@@ -50,8 +50,6 @@ def train_one_epoch(dataloader, model, optimizers, device, log_every_n_steps, ep
 def evaluate(dataloader, model, device, results_dir, epoch):
     model.eval()
     
-    total_loss = 0
-    
     for _, batch in enumerate(dataloader):
             
         img, target = batch
@@ -59,16 +57,15 @@ def evaluate(dataloader, model, device, results_dir, epoch):
         # filter out images without annotations and move to device
         keep = set([i for i in range(len(target)) if len(target[i]["boxes"]) > 0])
         img = [img[i].to(device) for i in range(len(img)) if i in keep]
-        target = [{k: v.to(device) for k, v in target[i].items()} for i in range(len(target)) if i in keep]
+        targets = [{k: v.to(device) for k, v in target[i].items()} for i in range(len(target)) if i in keep]
 
         with torch.no_grad():
-            loss_dict = model(img, target)
-            loss = sum(loss for loss in loss_dict.values())
+            outputs = model(img)
+            outputs = [{k: v.to(torch.device('cpu')) for k, v in t.items()} for t in outputs]
+            res = {target["image_id"]: output for target, output in zip(targets, outputs)}
+            print(res)
+            break
             
-        total_loss += loss.item()
-    global_step = epoch * len(dataloader)
-    log(results_dir, {"train-loss": total_loss / len(dataloader)}, step=global_step)
-    logging.info(f"Validation Loss: {total_loss / len(dataloader)}")
 
 
 @hydra.main(version_base=None, config_path=None)

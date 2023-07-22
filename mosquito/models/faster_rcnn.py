@@ -19,11 +19,10 @@ class FasterRCNN(BaseModel):
         # define a new head for the detector with required  of classes
         self.model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     
-    def forward(self, img, target):
+    def forward(self, img, target = None):
         return self.model(img, target)
     
     def configure_optimizers(self):
-        # TODO: add support for learning rate schedulers
         
         optimizer = torch.optim.SGD(self.model.parameters(),
                                     lr=self.cfg.learning_rate,
