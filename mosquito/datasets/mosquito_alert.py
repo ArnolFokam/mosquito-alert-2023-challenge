@@ -67,13 +67,6 @@ class MosquitoAlertDatasetv0(BaseDataset):
         image_hs = self.annotations_df["img_h"].values
         labels = self.annotations_df["class_label"].values
         
-        # convert labels to integers
-        self.word_to_integer = {}
-
-        # Assign unique integer values to each word
-        for i, word in enumerate(np.unique(labels)):
-            self.word_to_integer[word] = i
-            
         # Convert all words to integers
         labels = list(map(lambda x: self.word_to_integer[x], labels))
         

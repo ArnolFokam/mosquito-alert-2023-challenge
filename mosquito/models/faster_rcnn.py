@@ -53,7 +53,7 @@ class FasterRCNN(BaseModel):
                 labels = labels[torch.argmax(scores)]
                 
                 outputs[image_id]["boxes"] = boxes
-                outputs[image_id]["scores"] = scores
+                outputs[image_id]["scores"] = scores[torch.argmax(scores)]
                 outputs[image_id]["labels"] = labels
                 
         return outputs

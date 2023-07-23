@@ -1,6 +1,6 @@
 defaults:
-  - v0 # change this to training config filename (without the yaml)
+  - baseline # change this to training config filename (without the yaml)
   - _self_
 
 
-model_path: /mnt/data/home/manuel/mos/outputs/2023-07-21/14-33-16/model.pth
+model_path: /mnt/data/home/manuel/mos/results/2023-07-22/06-11-30/YDRU8XUDKL/model.pth
