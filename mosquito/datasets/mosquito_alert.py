@@ -113,7 +113,7 @@ class MosquitoAlertDatasetv0(BaseDataset):
     
     def __len__(self) -> int:
         return len(self.data)
-    
+        
     @staticmethod
     def get_train_and_val_dataset(cfg, transform=None):
         dataset = MosquitoAlertDatasetv0(cfg, transform)

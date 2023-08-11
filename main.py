@@ -165,12 +165,26 @@ def main(cfg: DictConfig):
     )
     train_dataloader, val_dataloader = None, None
     
+    # get the number of samples per class
+    class_counts = np.zeros(train_dataset.dataset.num_classes)
+    for i in range(len(train_dataset.indices)):
+        _, _, label = train_dataset.dataset.data[i]
+        class_counts[label] += 1
+    
+    # get the class weights
+    class_weights = 1.0 / class_counts
+    class_weights /= np.sum(class_weights)
+    
+    # get the weights for each sample
+    samples_weight = np.array([class_weights[train_dataset.dataset.data[i][2]] for i in range(len(train_dataset.indices))])
+    samples_weight = torch.from_numpy(samples_weight)
+    
     # create data loaders
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, 
-        batch_size=cfg.train_batch_size, 
-        shuffle=True, 
+        batch_size=cfg.train_batch_size,
         num_workers=8,
+        sampler=torch.utils.data.WeightedRandomSampler(samples_weight, len(samples_weight)),
         collate_fn=datasets[cfg.dataset_name].collate_fn
     )
     
